@@ -1,31 +1,36 @@
 #ifndef scene_hpp
 #define scene_hpp
 
+#include "clock.hpp"
 #include "fpscounter.hpp"
-#include "grid.hpp"
-#include "snake.hpp"
+#include "game.hpp"
 #include <SDL.h>
 
 class Scene {
 public:
-    Scene(SDL_Renderer* renderer_sdl);
-
-    GameState get_game_state() const;
-    void play_frame();
-    void draw_frame();
-    void wait_frame();
-
-    Grid grid;
-    Snake snake;
-
+    Scene();
+    
+    void run();
+    
+    ~Scene();
+    
 private:
+    SDL_Window* init_window();
+    SDL_Renderer* init_renderer();
+    
     void clear_frame();
-
-    GameState gameState;
-    const int maxFrameRate;
-    Uint64 prevMS;
+    void display_frame();
+    void delay_frame();
+    
+    const char* windowName;
+    bool vsyncOn;
+    SDL_Window* window;
     SDL_Renderer* renderer;
+    std::chrono::time_point<Scene_Clock> prevTime;
+    bool prevTimeValid;
+    double maxRefreshRate;
     FPSCounter fpsCounter;
+    Game game;
 };
 
 #endif /* scene_hpp */

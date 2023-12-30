@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FE7FDB8B2B3B435500A69E9F /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE7FDB892B3B435500A69E9F /* game.cpp */; };
+		FE8A84C72B3F31DD0040FD7B /* keyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE8A84C52B3F31DD0040FD7B /* keyboard.cpp */; };
 		FEB377A82B378045000994CF /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FEB3779E2B378044000994CF /* scene.cpp */; };
 		FEB377A92B378045000994CF /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FEB3779F2B378044000994CF /* main.cpp */; };
 		FEB377AA2B378045000994CF /* grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FEB377A22B378044000994CF /* grid.cpp */; };
@@ -43,20 +45,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FE7FDB892B3B435500A69E9F /* game.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game.cpp; sourceTree = "<group>"; };
+		FE7FDB8A2B3B435500A69E9F /* game.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = game.hpp; sourceTree = "<group>"; };
+		FE7FDB8C2B3B9AEF00A69E9F /* clock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = clock.hpp; sourceTree = "<group>"; };
+		FE8A84C52B3F31DD0040FD7B /* keyboard.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = keyboard.cpp; sourceTree = "<group>"; };
+		FE8A84C62B3F31DD0040FD7B /* keyboard.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = keyboard.hpp; sourceTree = "<group>"; };
 		FEB377942B378023000994CF /* snake */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = snake; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEB3779E2B378044000994CF /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scene.cpp; sourceTree = "<group>"; };
 		FEB3779F2B378044000994CF /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		FEB377A02B378044000994CF /* snake.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = snake.hpp; sourceTree = "<group>"; };
 		FEB377A12B378044000994CF /* scene.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = scene.hpp; sourceTree = "<group>"; };
 		FEB377A22B378044000994CF /* grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid.cpp; sourceTree = "<group>"; };
-		FEB377A32B378044000994CF /* main.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = main.hpp; sourceTree = "<group>"; };
 		FEB377A42B378044000994CF /* snake.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = snake.cpp; sourceTree = "<group>"; };
 		FEB377A52B378044000994CF /* fpscounter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fpscounter.cpp; sourceTree = "<group>"; };
 		FEB377A62B378044000994CF /* grid.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = grid.hpp; sourceTree = "<group>"; };
 		FEB377A72B378044000994CF /* fpscounter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fpscounter.hpp; sourceTree = "<group>"; };
 		FEB377B32B3780E8000994CF /* SDL2_ttf.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2_ttf.framework; path = ../../../../../Library/Frameworks/SDL2_ttf.framework; sourceTree = "<group>"; };
 		FEB377B42B3780E8000994CF /* SDL2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SDL2.framework; path = ../../../../../Library/Frameworks/SDL2.framework; sourceTree = "<group>"; };
-		FEB377BA2B390D43000994CF /* constants.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = constants.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,11 +106,13 @@
 		FEB377B02B378083000994CF /* src */ = {
 			isa = PBXGroup;
 			children = (
-				FEB377A52B378044000994CF /* fpscounter.cpp */,
-				FEB377A22B378044000994CF /* grid.cpp */,
 				FEB3779F2B378044000994CF /* main.cpp */,
 				FEB3779E2B378044000994CF /* scene.cpp */,
+				FEB377A52B378044000994CF /* fpscounter.cpp */,
+				FE7FDB892B3B435500A69E9F /* game.cpp */,
+				FEB377A22B378044000994CF /* grid.cpp */,
 				FEB377A42B378044000994CF /* snake.cpp */,
+				FE8A84C52B3F31DD0040FD7B /* keyboard.cpp */,
 			);
 			name = src;
 			sourceTree = "<group>";
@@ -113,12 +120,13 @@
 		FEB377B12B378091000994CF /* include */ = {
 			isa = PBXGroup;
 			children = (
-				FEB377A72B378044000994CF /* fpscounter.hpp */,
-				FEB377A62B378044000994CF /* grid.hpp */,
-				FEB377A32B378044000994CF /* main.hpp */,
 				FEB377A12B378044000994CF /* scene.hpp */,
+				FEB377A72B378044000994CF /* fpscounter.hpp */,
+				FE7FDB8A2B3B435500A69E9F /* game.hpp */,
+				FEB377A62B378044000994CF /* grid.hpp */,
 				FEB377A02B378044000994CF /* snake.hpp */,
-				FEB377BA2B390D43000994CF /* constants.hpp */,
+				FE8A84C62B3F31DD0040FD7B /* keyboard.hpp */,
+				FE7FDB8C2B3B9AEF00A69E9F /* clock.hpp */,
 			);
 			name = include;
 			sourceTree = "<group>";
@@ -195,6 +203,8 @@
 				FEB377A82B378045000994CF /* scene.cpp in Sources */,
 				FEB377AA2B378045000994CF /* grid.cpp in Sources */,
 				FEB377AC2B378045000994CF /* fpscounter.cpp in Sources */,
+				FE7FDB8B2B3B435500A69E9F /* game.cpp in Sources */,
+				FE8A84C72B3F31DD0040FD7B /* keyboard.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

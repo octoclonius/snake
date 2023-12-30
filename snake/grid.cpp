@@ -1,40 +1,73 @@
 #include "grid.hpp"
-#include <SDL.h>
-#include <array>
 #include <cstdlib>
 
-Grid::Grid(SDL_Renderer* _renderer) : wallRects(init_wall_rects()), renderer(_renderer) {
-    grid.fill(std::array<int, GRID_COLS>{});
-    //grid.at(START_TILE.y).at(START_TILE.x) = START_LEN;
+Grid::Grid(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize) : window(_window), renderer(_renderer), numRows(_numRows), numCols(_numCols), tileSize(_tileSize), gridSize(calc_grid_size()), sceneSize(calc_scene_size()), sceneOffset(calc_scene_offset()), gridOffset(calc_grid_offset()), wallRects(calc_wall_rects()), grid(numRows, std::vector<int>(numCols)) {}
+
+SDL_Point Grid::calc_grid_size() const {
+    return {numCols * tileSize, numRows * tileSize};
 }
 
-std::array<SDL_Rect, 4> constexpr Grid::init_wall_rects() {
-   return {{
+SDL_Point Grid::calc_scene_size() const {
+    return {gridSize.x + tileSize * 2, gridSize.y + tileSize * 2};
+}
+
+SDL_Point Grid::calc_scene_offset() const {
+    SDL_Point _windowSize;
+    if (SDL_GetRendererOutputSize(renderer, &_windowSize.x, &_windowSize.y) < 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_GetRendererOutputSize() failed: %s", SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
+    
+    return {(_windowSize.x - sceneSize.x) / 2, (_windowSize.y - sceneSize.y) / 2};
+}
+
+SDL_Point Grid::calc_grid_offset() const {
+    return {sceneOffset.x + tileSize, sceneOffset.y + tileSize};
+}
+
+std::vector<SDL_Rect> Grid::calc_wall_rects() const {
+   return {
        {
-           SCENE_OFFSET.x,
-           SCENE_OFFSET.y,
-           SCENE_SIZE.x,
-           WALL_SIZE
+           sceneOffset.x,
+           sceneOffset.y,
+           sceneSize.x,
+           tileSize
        },
        {
-           SCENE_OFFSET.x,
-           GRID_OFFSET.y + GRID_SIZE.y,
-           SCENE_SIZE.x,
-           WALL_SIZE
+           sceneOffset.x,
+           gridOffset.y + gridSize.y,
+           sceneSize.x,
+           tileSize
        },
        {
-           SCENE_OFFSET.x,
-           GRID_OFFSET.y,
-           WALL_SIZE,
-           GRID_SIZE.y
+           sceneOffset.x,
+           gridOffset.y,
+           tileSize,
+           gridSize.y
        },
        {
-           GRID_OFFSET.x + GRID_SIZE.x,
-           GRID_OFFSET.y,
-           WALL_SIZE,
-           GRID_SIZE.y
+           gridOffset.x + gridSize.x,
+           gridOffset.y,
+           tileSize,
+           gridSize.y
        }
-   }};
+   };
+}
+
+SDL_Point Grid::get_grid_size() const {
+    return gridSize;
+}
+
+SDL_Point Grid::get_scene_size() const {
+    return sceneSize;
+}
+
+SDL_Point Grid::get_scene_offset() const {
+    return sceneOffset;
+}
+
+SDL_Point Grid::get_grid_offset() const {
+    return gridOffset;
 }
 
 void Grid::draw_grid() {
@@ -42,20 +75,20 @@ void Grid::draw_grid() {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_SetRenderDrawColor() failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-    for (int i = 0; i <= grid.size(); ++i) {
+    for (int i = 0; i <= numRows; ++i) {
         SDL_RenderDrawLine(renderer,
-            GRID_OFFSET.x,
-            GRID_OFFSET.y + TILE_SIZE * i,
-            GRID_OFFSET.x + GRID_SIZE.x,
-            GRID_OFFSET.y + TILE_SIZE * i
+            gridOffset.x,
+            gridOffset.y + tileSize * i,
+            gridOffset.x + gridSize.x,
+            gridOffset.y + tileSize * i
         );
     }
-    for (int i = 0; i <= grid.front().size(); ++i) {
+    for (int i = 0; i <= numCols; ++i) {
         SDL_RenderDrawLine(renderer,
-            GRID_OFFSET.x + TILE_SIZE * i,
-            GRID_OFFSET.y,
-            GRID_OFFSET.x + TILE_SIZE * i,
-            GRID_OFFSET.y + GRID_SIZE.y
+            gridOffset.x + tileSize * i,
+            gridOffset.y,
+            gridOffset.x + tileSize * i,
+            gridOffset.y + gridSize.y
         );
     }
 }

@@ -1,67 +1,87 @@
 #include "fpscounter.hpp"
-#include <SDL.h>
-#include <SDL_ttf.h>
 #include <cmath>
 #include <string>
 #include <cstdlib>
 
-const char* FONT_PATH = "/System/Library/Fonts/Monaco.ttf";
+FPSCounter::FPSCounter(SDL_Window* _window, SDL_Renderer* _renderer) : window(_window), renderer(_renderer), textColor({255, 255, 255, SDL_ALPHA_OPAQUE}), font(init_font("/System/Library/Fonts/Monaco.ttf", 36)), textureRect(set_textureRect("0")), prevTime(), prevTimeValid(false), updateRate(10.0), frameCount(0) {}
 
-FPSCounter::FPSCounter(SDL_Renderer* _renderer) : renderer(_renderer), textColor(TEXT_COLOR), font(nullptr), texture(nullptr), windowWidth(WINDOW_SIZE.x), rect(SDL_Rect{0, 0, 0, 0}), updateIntervalMS(UPDATE_MS), frameCount(0), prevMS(0) {
-    font = TTF_OpenFont(FONT_PATH, FONT_PT);
-    if (font == nullptr) {
+TTF_Font* FPSCounter::init_font(const char* _fontPath, int _fontPtSize) {
+    if (TTF_Init() == -1) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "TTF_Init() failed: %s", TTF_GetError());
+        exit(EXIT_FAILURE);
+    }
+    
+    TTF_Font* _font = TTF_OpenFont(_fontPath, _fontPtSize);
+    if (_font == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "TTF_OpenFont() failed: %s", TTF_GetError());
         exit(EXIT_FAILURE);
     }
+    
+    return _font;
+}
 
-    SDL_Surface* surface = TTF_RenderUTF8_Solid(font, "0", textColor);
-    if (surface == nullptr) {
+FPSCounter::TextureRect FPSCounter::set_textureRect(const char* _fpsText) {
+    SDL_Surface* _surface = TTF_RenderUTF8_Solid(font, _fpsText, textColor);
+    if (_surface == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "TTF_RenderUTF8_Solid() failed: %s", TTF_GetError());
         exit(EXIT_FAILURE);
     }
-
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (texture == nullptr) {
+    
+    SDL_Texture* _texture = SDL_CreateTextureFromSurface(renderer, _surface);
+    if (_texture == nullptr) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface() failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-    rect = SDL_Rect{windowWidth - surface->w, 0, surface->w, surface->h};
-    SDL_FreeSurface(surface);
+    
+    int _windowWidth;
+    if (SDL_GetRendererOutputSize(renderer, &_windowWidth, nullptr) < 0) {
+        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_GetRendererOutputSize() failed: %s", SDL_GetError());
+        exit(EXIT_FAILURE);
+    }
+    
+    SDL_Rect _rect = SDL_Rect{_windowWidth - _surface->w, 0, _surface->w, _surface->h};
+    SDL_FreeSurface(_surface);
+    
+    return TextureRect{_texture, _rect};
 }
 
-void FPSCounter::draw_fps() {
-    auto currMS = SDL_GetTicks64();
+void FPSCounter::draw() {
+    auto _currTime = Scene_Clock::now();
     ++frameCount;
-
-    if (SDL_RenderCopy(renderer, texture, nullptr, &rect) < 0) {
+    if (!prevTimeValid) {
+        frameCount = 0;
+        prevTime = _currTime;
+        prevTimeValid = true;
+        return;
+    }
+    
+    if (SDL_RenderCopy(renderer, textureRect.texture, nullptr, &textureRect.rect) < 0) {
         SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_RenderCopy() failed: %s", SDL_GetError());
         exit(EXIT_FAILURE);
     }
-
-    auto currIntervalMS = currMS - prevMS;
-    if (currIntervalMS < updateIntervalMS) {
+    
+    auto _interval = std::chrono::duration_cast<std::chrono::nanoseconds>(_currTime - prevTime).count();
+    if (_interval < 1e9 / updateRate) {
         return;
     }
-
-    long fps = std::lround(1000.0 * frameCount / currIntervalMS);
-    std::string fpsString = std::to_string(fps);
-    const char* fpsText = fpsString.c_str();
-
-    SDL_Surface* surface = TTF_RenderUTF8_Solid(font, fpsText, textColor);
-    if (surface == nullptr) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "TTF_RenderUTF8_Solid() failed: %s", TTF_GetError());
-        exit(EXIT_FAILURE);
-    }
-
-    SDL_DestroyTexture(texture);
-    texture = SDL_CreateTextureFromSurface(renderer, surface);
-    if (texture == nullptr) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface() failed: %s", SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-    rect = SDL_Rect{windowWidth - surface->w, 0, surface->w, surface->h};
-    SDL_FreeSurface(surface);
-
+    
+    long _fps = std::lround(1e9 / _interval * frameCount);
+    std::string _fpsString = std::to_string(_fps);
+    const char* _fpsText = _fpsString.c_str();
+    
+    SDL_DestroyTexture(textureRect.texture);
+    textureRect = set_textureRect(_fpsText);
+    
     frameCount = 0;
-    prevMS = currMS;
+    prevTime = _currTime;
+}
+
+void FPSCounter::shutdown() {
+    if (font != nullptr) {
+        TTF_CloseFont(font);
+    }
+    
+    if (textureRect.texture != nullptr) {
+        SDL_DestroyTexture(textureRect.texture);
+    }
 }
