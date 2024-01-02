@@ -3,7 +3,7 @@
 
 #include "keyboard.hpp"
 #include "clock.hpp"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <list>
 #include <forward_list>
 #include <queue>
@@ -15,7 +15,10 @@ class Snake {
 public:
     Snake(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize, SDL_Point _gridOffset);
     
+    SDL_Point get_pos() const;
+    int get_len() const;
     bool check_collision();
+    void inc_len();
     void set_dir(const Keyboard _keyboard, SDL_Keycode _key);
     void move();
     void draw();

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FE0386CE2B43C40D0009E9BC /* libcrypto.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0386CC2B43C40D0009E9BC /* libcrypto.3.dylib */; };
+		FE0386CF2B43C40D0009E9BC /* libcrypto.3.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FE0386CC2B43C40D0009E9BC /* libcrypto.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		FE0386D02B43C40D0009E9BC /* libssl.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = FE0386CD2B43C40D0009E9BC /* libssl.3.dylib */; };
+		FE0386D12B43C40D0009E9BC /* libssl.3.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = FE0386CD2B43C40D0009E9BC /* libssl.3.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		FE7FDB8B2B3B435500A69E9F /* game.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE7FDB892B3B435500A69E9F /* game.cpp */; };
 		FE8A84C72B3F31DD0040FD7B /* keyboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE8A84C52B3F31DD0040FD7B /* keyboard.cpp */; };
 		FEB377A82B378045000994CF /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FEB3779E2B378044000994CF /* scene.cpp */; };
@@ -37,6 +41,8 @@
 			dstSubfolderSpec = 10;
 			files = (
 				FEB377B62B3780E8000994CF /* SDL2_ttf.framework in Embed Frameworks */,
+				FE0386CF2B43C40D0009E9BC /* libcrypto.3.dylib in Embed Frameworks */,
+				FE0386D12B43C40D0009E9BC /* libssl.3.dylib in Embed Frameworks */,
 				FEB377B82B3780E8000994CF /* SDL2.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -45,6 +51,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		FE0386CC2B43C40D0009E9BC /* libcrypto.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.3.dylib; path = "../../../../../usr/local/Cellar/openssl@3/3.2.0_1/lib/libcrypto.3.dylib"; sourceTree = "<group>"; };
+		FE0386CD2B43C40D0009E9BC /* libssl.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libssl.3.dylib; path = "../../../../../usr/local/Cellar/openssl@3/3.2.0_1/lib/libssl.3.dylib"; sourceTree = "<group>"; };
 		FE7FDB892B3B435500A69E9F /* game.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = game.cpp; sourceTree = "<group>"; };
 		FE7FDB8A2B3B435500A69E9F /* game.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = game.hpp; sourceTree = "<group>"; };
 		FE7FDB8C2B3B9AEF00A69E9F /* clock.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = clock.hpp; sourceTree = "<group>"; };
@@ -70,6 +78,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				FEB377B52B3780E8000994CF /* SDL2_ttf.framework in Frameworks */,
+				FE0386CE2B43C40D0009E9BC /* libcrypto.3.dylib in Frameworks */,
+				FE0386D02B43C40D0009E9BC /* libssl.3.dylib in Frameworks */,
 				FEB377B72B3780E8000994CF /* SDL2.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -134,6 +144,8 @@
 		FEB377B22B3780E8000994CF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				FE0386CC2B43C40D0009E9BC /* libcrypto.3.dylib */,
+				FE0386CD2B43C40D0009E9BC /* libssl.3.dylib */,
 				FEB377B32B3780E8000994CF /* SDL2_ttf.framework */,
 				FEB377B42B3780E8000994CF /* SDL2.framework */,
 			);
@@ -337,8 +349,19 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/sdl2/2.28.5/include,
+					/usr/local/Cellar/sdl2_ttf/2.20.2/include,
+					"/usr/local/Cellar/openssl@3/3.2.0_1/include",
 					/Library/Frameworks/SDL2.framework/Headers,
 					/Library/Frameworks/SDL2_ttf.framework/Headers,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/usr/local/Cellar/openssl@3/3.2.0_1/lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcrypto",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -355,8 +378,19 @@
 					"$(LOCAL_LIBRARY_DIR)/Frameworks",
 				);
 				HEADER_SEARCH_PATHS = (
+					/usr/local/Cellar/sdl2/2.28.5/include,
+					/usr/local/Cellar/sdl2_ttf/2.20.2/include,
+					"/usr/local/Cellar/openssl@3/3.2.0_1/include",
 					/Library/Frameworks/SDL2.framework/Headers,
 					/Library/Frameworks/SDL2_ttf.framework/Headers,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"/usr/local/Cellar/openssl@3/3.2.0_1/lib",
+				);
+				OTHER_LDFLAGS = (
+					"-lssl",
+					"-lcrypto",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

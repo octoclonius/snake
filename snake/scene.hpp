@@ -4,7 +4,7 @@
 #include "clock.hpp"
 #include "fpscounter.hpp"
 #include "game.hpp"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 class Scene {
 public:

@@ -1,8 +1,8 @@
 #include "game.hpp"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
-Game::Game(SDL_Window* _window, SDL_Renderer* _renderer) : window(_window), renderer(_renderer), state(State::newGame), keyboard(), numRows(11), numCols(15), tileSize(90), grid(window, renderer, numRows, numCols, tileSize), snake(window, renderer, numRows, numCols, tileSize, grid.get_grid_offset()) {}
+Game::Game(SDL_Window* _window, SDL_Renderer* _renderer) : window(_window), renderer(_renderer), state(State::newGame), keyboard(), numRows(11), numCols(15), tileSize(150), grid(window, renderer, numRows, numCols, tileSize), snake(window, renderer, numRows, numCols, tileSize, grid.get_grid_offset()) {}
 
 bool Game::gameOn() const {
     return state != State::quitGame;
@@ -26,6 +26,7 @@ void Game::poll() {
 
 void Game::step() {
     std::vector<SDL_Keycode> _movementKeys{SDLK_w, SDLK_a, SDLK_s, SDLK_d};
+    SDL_Point _prevPos, _currPos;
     switch (state) {
         case State::newGame:
             for (const auto _key : _movementKeys) {
@@ -37,11 +38,21 @@ void Game::step() {
             break;
             
         case State::playGame:
+            _prevPos = snake.get_pos();
+            snake.move();
             if (snake.check_collision()) {
                 state = State::gameOver;
                 break;
             }
-            snake.move();
+            _currPos = snake.get_pos();
+            if (_currPos.x != _prevPos.x || _currPos.y != _prevPos.y) {
+                int _status = grid.update(_prevPos, _currPos, snake.get_len());
+                if (_status == 1) {
+                    snake.inc_len();
+                } else if (_status != 0) {
+                    state = State::gameOver;
+                }
+            }
             break;
             
         case State::gameOver:
@@ -49,6 +60,7 @@ void Game::step() {
             for (SDL_Event _event; SDL_PollEvent(&_event) != 0;);
             keyboard.reset();
             snake.reset();
+            grid.reset();
             state = State::newGame;
             break;
             
@@ -62,6 +74,7 @@ void Game::step() {
 
 void Game::draw() {
     grid.draw_grid();
+    grid.draw_fruit();
     snake.draw();
     grid.draw_walls();
 }

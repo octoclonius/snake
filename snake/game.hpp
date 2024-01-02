@@ -4,7 +4,7 @@
 #include "keyboard.hpp"
 #include "grid.hpp"
 #include "snake.hpp"
-#include <SDL.h>
+#include <SDL2/SDL.h>
 
 enum class State;
 

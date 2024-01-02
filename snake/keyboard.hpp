@@ -1,7 +1,7 @@
 #ifndef keyboard_hpp
 #define keyboard_hpp
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <unordered_map>
 
 class Keyboard {

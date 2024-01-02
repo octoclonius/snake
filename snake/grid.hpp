@@ -1,19 +1,23 @@
 #ifndef grid_hpp
 #define grid_hpp
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <vector>
 
 class Grid {
 public:
     Grid(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize);
     
+    SDL_Point init_fruit(SDL_Point _fruitPos);
     SDL_Point get_grid_size() const;
     SDL_Point get_scene_size() const;
     SDL_Point get_scene_offset() const;
     SDL_Point get_grid_offset() const;
+    int update(SDL_Point _prevPos, SDL_Point _currPos, int _snakeLen);
     void draw_grid();
     void draw_walls();
+    void draw_fruit();
+    void reset();
 
 private:
     SDL_Point calc_grid_size() const;
@@ -33,6 +37,7 @@ private:
     SDL_Point gridOffset;
     std::vector<std::vector<int>> grid;
     std::vector<SDL_Rect> wallRects;
+    SDL_Point fruitPos;
 };
 
 #endif /* grid_hpp */

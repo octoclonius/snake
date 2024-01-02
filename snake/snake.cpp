@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 
-Snake::Snake(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize, SDL_Point _gridOffset) : window(_window), renderer(_renderer), numRows(_numRows), numCols(_numCols), tileSize(_tileSize), gridOffset(_gridOffset), joints(init_joints({2, 5}, 3, Direction::right)), offset(tileSize - 0.1), speed(5.0 * tileSize), keyBuffer(), turnBuffer(), prevTime(), prevTimeValid(false) {}
+Snake::Snake(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize, SDL_Point _gridOffset) : window(_window), renderer(_renderer), numRows(_numRows), numCols(_numCols), tileSize(_tileSize), gridOffset(_gridOffset), joints(init_joints({2, 5}, 3, Direction::right)), offset(tileSize - 0.1), speed(10.0 * tileSize), keyBuffer(), turnBuffer(), prevTime(), prevTimeValid(false) {}
 
 std::list<Snake::Joint> Snake::init_joints(SDL_Point _tile, int _len, Direction _dir) {
     std::list<Joint> _joints;
@@ -33,6 +33,36 @@ std::list<Snake::Joint> Snake::init_joints(SDL_Point _tile, int _len, Direction 
     }
     
     return _joints;
+}
+
+SDL_Point Snake::get_pos() const {
+    SDL_Point _headPos = joints.back().tile;
+    switch (joints.back().dir) {
+        case Direction::up:
+            --_headPos.y;
+            break;
+            
+        case Direction::down:
+            ++_headPos.y;
+            break;
+            
+        case Direction::left:
+            --_headPos.x;
+            break;
+            
+        case Direction::right:
+            ++_headPos.x;
+            break;
+            
+        default:
+            break;
+    }
+    
+    return _headPos;
+}
+
+int Snake::get_len() const {
+    return static_cast<int>(joints.size());
 }
 
 bool Snake::check_collision() {
@@ -76,83 +106,62 @@ bool Snake::check_collision() {
         default:
             break;
     }
-
-    /* Check joints */
-    for (auto joint = joints.begin(); std::next(joint) != joints.end(); ++joint) {
-        SDL_Rect jointRect = {
-            gridOffset.x + tileSize * joint->tile.x,
-            gridOffset.y + tileSize * joint->tile.y,
-            tileSize,
-            tileSize
-        };
-        
-        switch (joint->dir) {
-            case Direction::up:
-                if (joint->dir != std::next(joint)->dir) {
-                    jointRect.h -= static_cast<int>(offset);
-                } else {
-                    jointRect.y -= static_cast<int>(offset);
-                }
-                break;
-                
-            case Direction::down:
-                if (joint->dir != std::next(joint)->dir) {
-                    jointRect.h -= static_cast<int>(offset);
-                }
-                jointRect.y += static_cast<int>(offset);
-                break;
-                
-            case Direction::left:
-                if (joint->dir != std::next(joint)->dir) {
-                    jointRect.w -= static_cast<int>(offset);
-                } else {
-                    jointRect.x += static_cast<int>(offset);
-                }
-                break;
-                
-            case Direction::right:
-                if (joint->dir != std::next(joint)->dir) {
-                    jointRect.w -= static_cast<int>(offset);
-                }
-                jointRect.x += static_cast<int>(offset);
-                break;
-                
-            default:
-                break;
-        }
-
-        if (SDL_HasIntersection(&headRect, &jointRect) == SDL_TRUE) {
-            return true;
-        }
-    }
-
+    
     return false;
+}
+
+void Snake::inc_len() {
+    switch (joints.front().dir) {
+        case Direction::up:
+            joints.emplace_front(Joint{{joints.front().tile.x, joints.front().tile.y + 1}, joints.front().dir});
+            break;
+            
+        case Direction::down:
+            joints.emplace_front(Joint{{joints.front().tile.x, joints.front().tile.y - 1}, joints.front().dir});
+            break;
+            
+        case Direction::left:
+            joints.emplace_front(Joint{{joints.front().tile.x + 1, joints.front().tile.y}, joints.front().dir});
+            break;
+            
+        case Direction::right:
+            joints.emplace_front(Joint{{joints.front().tile.x - 1, joints.front().tile.y}, joints.front().dir});
+            break;
+            
+        default:
+            break;
+    }
 }
 
 void Snake::set_dir(const Keyboard _keyboard, SDL_Keycode _key) {
     if (_keyboard.get_key(_key)) {
         if (std::find(keyBuffer.begin(), keyBuffer.end(), _key) == keyBuffer.end()) {
             keyBuffer.push_front(_key);
-            
-            if (joints.back().dir == Direction::left || joints.back().dir == Direction::right) {
-                if (_key == SDLK_w) {
+            switch (_key) {
+                case SDLK_w:
                     turnBuffer.push(Direction::up);
-                } else if (_key == SDLK_s) {
-                    turnBuffer.push(Direction::down);
-                }
-            } else {
-                if (_key == SDLK_a) {
+                    break;
+                    
+                case SDLK_a:
                     turnBuffer.push(Direction::left);
-                } else if (_key == SDLK_d) {
+                    break;
+                    
+                case SDLK_s:
+                    turnBuffer.push(Direction::down);
+                    break;
+                    
+                case SDLK_d:
                     turnBuffer.push(Direction::right);
-                }
+                    break;
+                    
+                default:
+                    break;
             }
         }
     } else if (!keyBuffer.empty()) {
         for (auto it = keyBuffer.before_begin(); std::next(it) != keyBuffer.end(); ++it) {
             if (*std::next(it) == _key) {
                 keyBuffer.erase_after(it);
-                
                 if (!keyBuffer.empty()) {
                     switch (keyBuffer.front()) {
                         case SDLK_w:
@@ -244,12 +253,43 @@ void Snake::move() {
 }
 
 void Snake::draw() {
-    if (SDL_SetRenderDrawColor(renderer, 0, 0, 255, SDL_ALPHA_OPAQUE) < 0) {
-        SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_SetRenderDrawColor() failed: %s", SDL_GetError());
-        exit(EXIT_FAILURE);
-    }
-    
-    for (auto joint = joints.begin(); joint != joints.end(); ++joint) {
+    int _i = -10;
+    for (auto joint = joints.rbegin(); joint != joints.rend(); ++joint) {
+        _i += 10;
+        _i %= 256 * 6;
+        
+        int _r, _g, _b;
+        if (_i < 256 * 1) {
+            _r = 0;
+            _g = _i;
+            _b = 255;
+        } else if (_i < 256 * 2) {
+            _r = 0;
+            _g = 255;
+            _b = 255 - (_i % 256);
+        } else if (_i < 256 * 3) {
+            _r = _i % 256;
+            _g = 255;
+            _b = 0;
+        } else if (_i < 256 * 4) {
+            _r = 255;
+            _g = 255 - (_i % 256);
+            _b = 0;
+        } else if (_i < 256 * 5) {
+            _r = 255;
+            _g = 0;
+            _b = _i % 256;
+        } else {
+            _r = 255 - (_i % 256);
+            _g = 0;
+            _b = _i % 256;
+        }
+        
+        if (SDL_SetRenderDrawColor(renderer, _r % 256, _g % 256, _b % 256, SDL_ALPHA_OPAQUE) < 0) {
+            SDL_LogError(SDL_LOG_CATEGORY_ERROR, "SDL_SetRenderDrawColor() failed: %s", SDL_GetError());
+            exit(EXIT_FAILURE);
+        }
+        
         SDL_Rect jointRect = {
             gridOffset.x + tileSize * joint->tile.x,
             gridOffset.y + tileSize * joint->tile.y,
@@ -257,8 +297,8 @@ void Snake::draw() {
             tileSize
         };
         
-        auto nextJoint = std::next(joint);
-        if (nextJoint != joints.end() && joint->dir != nextJoint->dir) {
+        auto nextJoint = std::prev(joint);
+        if (nextJoint != joints.rend() && joint->dir != nextJoint->dir) {
             SDL_Rect cornerRect = jointRect;
             switch (joint->dir) {
                 case Direction::up:
