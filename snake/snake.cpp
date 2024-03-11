@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstdlib>
 
-Snake::Snake(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize, SDL_Point _gridOffset) : window(_window), renderer(_renderer), numRows(_numRows), numCols(_numCols), tileSize(_tileSize), gridOffset(_gridOffset), joints(init_joints({2, 5}, 3, Direction::right)), offset(tileSize - 0.1), speed(10.0 * tileSize), keyBuffer(), turnBuffer(), prevTime(), prevTimeValid(false) {}
+Snake::Snake(SDL_Window* _window, SDL_Renderer* _renderer, int _numRows, int _numCols, int _tileSize, SDL_Point _gridOffset) : window(_window), renderer(_renderer), numRows(_numRows), numCols(_numCols), tileSize(_tileSize), gridOffset(_gridOffset), joints(init_joints({2, 5}, 3, Direction::right)), offset(tileSize - 0.1), speed(5.0 * tileSize), keyBuffer(), turnBuffer(), prevTime(), prevTimeValid(false) {}
 
 std::list<Snake::Joint> Snake::init_joints(SDL_Point _tile, int _len, Direction _dir) {
     std::list<Joint> _joints;
